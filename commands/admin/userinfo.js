@@ -1,12 +1,18 @@
-const { ContextMenuCommandBuilder, ApplicationCommandType, EmbedBuilder } = require('discord.js');
+const { ContextMenuCommandBuilder, ApplicationCommandType, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
     data: new ContextMenuCommandBuilder()
         .setName('userinfo')
-        .setType(ApplicationCommandType.User),
-    usage: '/ip',
+        .setType(ApplicationCommandType.User)
+        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
+    usage: 'Clique droit sur un membre -> Apps -> userinfo',
     description: 'Obtenir des informations sur un membre.',
     async execute(interaction) {
+        if (!interaction.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
+            // If the user doesn't have the required permission, send an error message
+            interaction.reply({ content: 'You do not have the required permissions to use this command.', ephemeral: true });
+            return;
+        }
         const target = await interaction.guild.members.fetch(interaction.targetId);
 
         const Response = new EmbedBuilder()

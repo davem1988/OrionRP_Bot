@@ -7,20 +7,26 @@ module.exports = {
         .addNumberOption(option => 
             option
             .setName('nombre')
-            .setDescription('Le nombre de messages à suprimer')
+            .setDescription('Le nombre de messages à suprimer (Max 100)')
+            .setMaxValue(100)
             .setRequired(true))
         .addUserOption(option =>
 			option
-				.setName('member')
+				.setName('membre')
 				.setDescription('Le membre pour lequel vous voulez suprimer des messages')
 				.setRequired(false))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
         .setDMPermission(false),
     usage: '/clear 10 || /clear 10 @Dedemg1988',
     async execute(interaction) {
+        if (!interaction.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+            // If the user doesn't have the required permission, send an error message
+            interaction.reply({ content: 'You do not have the required permissions to use this command.', ephemeral: true });
+            return;
+        }
         const { channel, options } = interaction;
         const Amount = options.getNumber("nombre");
-        const Target = options.getUser("member");
+        const Target = options.getUser("membre");
 
         const Response = new EmbedBuilder()
         .setColor('LuminousVividPink');
@@ -40,11 +46,14 @@ module.exports = {
                     }
                 })
                 
-                Response.setDescription(`🧹 Cleared ${Amount} messages from ${Target}.`);
+                if (Amount < filteredMessages){
+                    Amount = filteredMessages.length
+                }
+                Response.setDescription(`🧹 Supprimé ${Amount} messages de ${Target}.`);
             }
         } else {
             await channel.bulkDelete(Amount, true).then((deletedMessages) => {
-                Response.setDescription(`🧹 Cleared ${deletedMessages.size} messages from this channel.`);
+                Response.setDescription(`🧹 Supprimé ${deletedMessages.size} messages dans ce salon.`);
             });
         }
 
