@@ -8,21 +8,27 @@ const {
     TOKEN: token,
 } = process.env;
 const fs = require("node:fs");
- 
-console.log(token);
- 
 const commands = [];
-// Grab all the command files from the commands directory you created earlier
-const commandFiles = fs
-    .readdirSync("./commands")
-    .filter((file) => file.endsWith(".js"));
- 
-// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
-for (const file of commandFiles) {
-    const command = require(`./commands/${file}`);
-    commands.push(command.data.toJSON());
+
+// Function to recursively load command files from a directory
+function loadCommandsFromDirectory(directory) {
+    const commandFiles = fs.readdirSync(directory).filter((file) => file.endsWith(".js"));
+    for (const file of commandFiles) {
+        const command = require(`./${directory}/${file}`);
+        if (command.data) {
+            commands.push(command.data.toJSON());
+        }
+    }
+
+    const subdirectories = fs.readdirSync(directory, { withFileTypes: true }).filter((dirent) => dirent.isDirectory());
+    for (const subdir of subdirectories) {
+        loadCommandsFromDirectory(`${directory}/${subdir.name}`);
+    }
 }
- 
+
+// Load commands from all subdirectories of "commands"
+loadCommandsFromDirectory("commands");
+
 // Construct and prepare an instance of the REST module
 const rest = new REST({ version: "10" }).setToken(token);
  

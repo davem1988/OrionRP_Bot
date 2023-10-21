@@ -18,13 +18,14 @@ module.exports = {
         )
         .setColor('Blue')
         .setThumbnail(member.user.displayAvatarURL())
+        .setTimestamp()
 
         /* const guild = member.guild
         const fondaRole = guild.roles.cache.find(role => role.name === 'Fondateurs')
         console.log(fondaRole)
 
         member.roles.add(fondaRole) */
-        
+
         channel.send({embeds: [newMemberEmbed]});
     },
 };

@@ -4,6 +4,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('ip')
         .setDescription('Ip Du Serveur'),
+    usage: '/ip',
     async execute(interaction) {
         const ipEmbed = new EmbedBuilder()
         .setTitle('Commande: /ip')
