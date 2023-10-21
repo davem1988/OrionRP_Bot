@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "discord.js": "^14.13.0",
+    "dotenv": "^16.3.1"
+  },
+  "name": "orionrp_bot",
+  "version": "1.0.0",
+  "description": "Discord Bot for Fivem Server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Dedem1988",
+  "license": "ISC"
+}
