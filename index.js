@@ -59,3 +59,6 @@ client.on('ready', () => {
 client.login(token);
 
 module.exports = client;
+
+
+/* this is a test */
