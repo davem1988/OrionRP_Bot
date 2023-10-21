@@ -5,6 +5,7 @@ module.exports = {
         .setName('userinfo')
         .setType(ApplicationCommandType.User),
     usage: '/ip',
+    description: 'Obtenir des informations sur un membre.',
     async execute(interaction) {
         const target = await interaction.guild.members.fetch(interaction.targetId);
 
