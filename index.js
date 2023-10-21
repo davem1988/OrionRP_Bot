@@ -56,10 +56,6 @@ for (const folder of commandFolders) {
     }
 }
 
-client.on('ready', () => {
-    console.log('Client logged in!')
-});
-
 client.login(token);
 
 module.exports = client;

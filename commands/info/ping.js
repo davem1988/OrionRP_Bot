@@ -7,13 +7,18 @@ module.exports = {
         usage: '/ping',
     async execute(interaction) {
         const pingEmbed = new EmbedBuilder()
-        .setTitle('Commande: /ping')
+        .setTitle('Commande: /ping 🏓')
         .setColor('Yellow')
-        .setDescription('Pong')
+        .setDescription("Calculating ping...")
         .setTimestamp()
         .setAuthor({ name: `${interaction.client.user.username}`})
 
         
-        return await interaction.reply({embeds: [pingEmbed]});
+        const initialMessage = await interaction.reply({ embeds: [pingEmbed]});
+        const ping = initialMessage.createdTimestamp - interaction.createdTimestamp;
+
+        // Update the initial message with the calculated ping
+        pingEmbed.setDescription(`Bot Latency: ${ping}ms\nAPI Latency: ${interaction.client.ws.ping}ms`);
+        initialMessage.edit({ embeds: [pingEmbed]});
     }
 };

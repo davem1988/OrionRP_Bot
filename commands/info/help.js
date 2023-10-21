@@ -48,7 +48,7 @@ module.exports = {
                 const hyphenLine = '- '.repeat(upperCaseName.length);
                 Response.addFields({
                     name: `${upperCaseName}\n${hyphenLine}`,
-                    value: `*Usage*: \`${ChunkCommand.usage || 'Usage not provided'}\`\n*Description*: ${ChunkCommand.data.description || 'Description not provided'}`,
+                    value: `*Usage*: \`${ChunkCommand.usage || 'Usage not provided'}\`\n*Description*: ${ChunkCommand.data.description || ChunkCommand.description || 'Description not provided'}`,
                     inline: true
                 });
             });

@@ -3,7 +3,7 @@ const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('disc
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('clear')
-        .setDescription('Ip Du Serveur')
+        .setDescription('Supprimer un nombre de messages ou supprimer un nombre de message pour un membre précis')
         .addNumberOption(option => 
             option
             .setName('nombre')
@@ -16,7 +16,7 @@ module.exports = {
 				.setRequired(false))
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
         .setDMPermission(false),
-    usage: '/clear 10 || /clear @Dedemg1988 10',
+    usage: '/clear 10 || /clear 10 @Dedemg1988',
     async execute(interaction) {
         const { channel, options } = interaction;
         const Amount = options.getNumber("nombre");
@@ -26,10 +26,8 @@ module.exports = {
         .setColor('LuminousVividPink');
 
         if (Target) {
-            // Fetch and filter messages from the channel sent by the target user
             const messages = await channel.messages.fetch();
             const filteredMessages = messages.filter((message) => message.author.id === Target.id);
-            // Delete the filtered messages
             if (Amount > 0) {
                 let i = 0
                 
@@ -45,7 +43,6 @@ module.exports = {
                 Response.setDescription(`🧹 Cleared ${Amount} messages from ${Target}.`);
             }
         } else {
-            // Fetch and delete messages from the channel directly
             await channel.bulkDelete(Amount, true).then((deletedMessages) => {
                 Response.setDescription(`🧹 Cleared ${deletedMessages.size} messages from this channel.`);
             });
