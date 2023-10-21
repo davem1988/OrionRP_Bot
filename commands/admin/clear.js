@@ -1,53 +1,58 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('clear')
         .setDescription('Ip Du Serveur')
+        .addNumberOption(option => 
+            option
+            .setName('nombre')
+            .setDescription('Le nombre de messages à suprimer')
+            .setRequired(true))
         .addUserOption(option =>
 			option
 				.setName('member')
 				.setDescription('Le membre pour lequel vous voulez suprimer des messages')
 				.setRequired(false))
-        .addNumberOption(option => 
-            option
-            .setName('nombre')
-            .setDescritption('Le nombre de messages à suprimer')
-            .setRequired(true)),
+        .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
+        .setDMPermission(false),
     usage: '/clear 10 || /clear @Dedemg1988 10',
     async execute(interaction) {
         const { channel, options } = interaction;
-        const Amount = options.getNumber("amount");
-        const Target = options.getMember("target");
-
-        const Messages = await channel.messages.fetch();
+        const Amount = options.getNumber("nombre");
+        const Target = options.getUser("member");
 
         const Response = new EmbedBuilder()
         .setColor('LuminousVividPink');
 
-        if(Target) {
-            let i = 0;
-            const filtered = [];
-            (await Messages).filter((m) => {
-                if(m.author.id === Target.id && Amount > i) {
-                    filtered.push(m);
-                    i++;
-                }
-            })
-
-            await channel.bulkDelete(filtered, true).then(messages => {
-                Response.setDescription(`🧹 Cleared ${messages.size} from ${Target}.`);
-                interaction.messages.reply({embeds: [Response]}).then(
-                setTimeout(() => interaction.deleteReply(), 10000))
-                .catch(console.error);
-            })
+        if (Target) {
+            // Fetch and filter messages from the channel sent by the target user
+            const messages = await channel.messages.fetch();
+            const filteredMessages = messages.filter((message) => message.author.id === Target.id);
+            // Delete the filtered messages
+            if (Amount > 0) {
+                let i = 0
+                
+                
+                filteredMessages.forEach(messageToDelete => {
+                    if (i < Amount) {
+                        console.log(i)
+                        messageToDelete.delete()
+                        i++
+                    }
+                })
+                
+                Response.setDescription(`🧹 Cleared ${Amount} messages from ${Target}.`);
+            }
         } else {
-            await channel.bulkDelete(Amount, true).then(messages => {
-                Response.setDescription(`🧹 Cleared ${messages.size} from this channel.`);
-                interaction.reply({embeds: [Response]}).then(
-                setTimeout(() => interaction.deleteReply(), 10000))
-                .catch(console.error);
-            })
+            // Fetch and delete messages from the channel directly
+            await channel.bulkDelete(Amount, true).then((deletedMessages) => {
+                Response.setDescription(`🧹 Cleared ${deletedMessages.size} messages from this channel.`);
+            });
         }
+
+        interaction.reply({ embeds: [Response] }).then(() => {
+            setTimeout(() => interaction.deleteReply(), 10000);
+        }).catch(console.error);
     }
 };
