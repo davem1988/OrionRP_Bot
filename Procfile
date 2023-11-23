@@ -1,1 +1,1 @@
-web: node index.js -p $3232
+worker: node index.js -p $3232
