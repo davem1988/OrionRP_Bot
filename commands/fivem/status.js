@@ -11,6 +11,9 @@ module.exports = {
     usage: '/ip',
     async execute(interaction) {
         const server = new FiveM.Server(`${IP}:${PORT}`)
+        let status
+
+
 
         const StatusEmbed = new EmbedBuilder()
         .setTitle('Status du Serveur')
@@ -19,9 +22,19 @@ module.exports = {
         .setTimestamp()
         .setAuthor({ name: `${interaction.client.user.username}`})
 
-        server.getServerStatus().then(status => {
-            console.log(status)
+        server.getServerStatus().then(state => {
+            status = state.online
         })
+
+        if (status === false){
+            StatusEmbed.addFields(
+                {name: 'Online', value: '🔴'}
+            )
+        }else if (status === true){
+            StatusEmbed.addFields(
+                {name: 'Online', value: '🟢'}
+            )
+        }
 
 
 
