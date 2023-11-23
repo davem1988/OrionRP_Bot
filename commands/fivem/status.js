@@ -28,11 +28,11 @@ module.exports = {
 
         if (status === false){
             StatusEmbed.addFields(
-                {name: 'Online', value: '🔴'}
+                {name: 'Online', value: '🔴'},
             )
         }else if (status === true){
             StatusEmbed.addFields(
-                {name: 'Online', value: '🟢'}
+                {name: 'Online', value: '🟢'},
             )
         }
 
