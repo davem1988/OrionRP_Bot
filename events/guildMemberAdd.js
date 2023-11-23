@@ -1,5 +1,6 @@
-const { Events, EmbedBuilder } = require('discord.js');
+const { Events, EmbedBuilder, AttachmentBuilder } = require('discord.js');
 const channelId = '1165065230578110594'
+const file = new AttachmentBuilder('../container/files/welcome.gif');
 module.exports = {
     name: Events.GuildMemberAdd,
     once: false,
@@ -18,14 +19,14 @@ module.exports = {
         )
         .setColor('Blue')
         .setThumbnail(member.user.displayAvatarURL())
+        .setImage('attachment://welcome.gif')
         .setTimestamp()
 
-        /* const guild = member.guild
-        const fondaRole = guild.roles.cache.find(role => role.name === 'Fondateurs')
-        console.log(fondaRole)
+        const guild = member.guild
+        const memberRole = guild.roles.cache.find(role => role.id === '1144611247233433601')
 
-        member.roles.add(fondaRole) */
+        member.roles.add(memberRole)
 
-        channel.send({embeds: [newMemberEmbed]});
+        channel.send({embeds: [newMemberEmbed], files: [file]});
     },
 };
