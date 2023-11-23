@@ -4,6 +4,7 @@ const path = require('node:path');
 require('dotenv').config();
 const token = process.env.TOKEN;
 
+
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,

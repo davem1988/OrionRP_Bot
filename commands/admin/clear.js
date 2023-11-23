@@ -40,7 +40,6 @@ module.exports = {
                 
                 filteredMessages.forEach(messageToDelete => {
                     if (i < Amount) {
-                        console.log(i)
                         messageToDelete.delete()
                         i++
                     }
