@@ -70,8 +70,6 @@ module.exports = {
         // Set an interval to update the status every 5 minutes (adjust as needed)
         const updateInterval = setInterval(updateStatus, 30 * 1000);
 
-        // Make sure to clear the interval when the command is no longer active (e.g., if the bot restarts)
-        interaction.client.once('interactionCreate', () => clearInterval(updateInterval));
     }
 };
 
