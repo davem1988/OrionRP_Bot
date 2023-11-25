@@ -1,6 +1,7 @@
 const { Events, EmbedBuilder, AttachmentBuilder } = require('discord.js');
+const path = require('path');
 const channelId = '1165065230578110594'
-const file = new AttachmentBuilder('../../files/welcome.gif');
+const file = new AttachmentBuilder(path.join(__dirname, '../../files/welcome.gif'));
 module.exports = {
     name: Events.GuildMemberAdd,
     once: false,
