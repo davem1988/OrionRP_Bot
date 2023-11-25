@@ -48,7 +48,7 @@ module.exports = {
 
                 StatusEmbed.fields.push(
                     { name: 'Connection: ', value: 'Pour vous connecter via IP ouvrez FiveM,\n appuyez sur F8 puis entrez la commande suivante\n incluant "connect".\n\n```connect 88.198.53.38:27805```' },
-                    { name: 'Actuellement en ligne: ', value:  `\`\`${playersNumber} Joueurs\`\``}
+                    { name: 'Actuellement en ligne: ', value:  `\`\`${playersNumber} Joueur(s)\`\``}
                 );
 
                 // Edit the deferred reply
