@@ -9,7 +9,7 @@ module.exports = {
         const ipEmbed = new EmbedBuilder()
         .setTitle('Commande: /ip')
         .setColor('Yellow')
-        .setDescription('Pour vous connecter avec le IP appuyer sur F8 lorsque FiveM est ouvert et entrer la commande: \n\nconnect 23.26.224.7:30161')
+        .setDescription('Pour vous connecter avec le IP appuyer sur F8 lorsque FiveM est ouvert et entrer la commande: \n\nconnect 88.198.53.38:30055')
         .setTimestamp()
         .setAuthor({ name: `${interaction.client.user.username}`})
 

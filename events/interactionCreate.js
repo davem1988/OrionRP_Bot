@@ -19,6 +19,8 @@ module.exports = {
                 console.error(`Error executing ${interaction.commandName}`);
                 console.error(error);
             }
+        } else {
+            return
         }
  
 

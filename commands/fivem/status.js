@@ -10,7 +10,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('status')
         .setDescription('Voir le status du serveur'),
-    usage: '/ip',
+    usage: '/status',
     async execute(interaction) {
         const server = new FiveM.Server(`${IP}:${PORT}`);
         
@@ -47,7 +47,7 @@ module.exports = {
                 }
 
                 StatusEmbed.fields.push(
-                    { name: 'Connection: ', value: 'Pour vous connecter via IP ouvrez FiveM,\n appuyez sur F8 puis entrez la commande suivante\n incluant "connect".\n\n```connect 88.198.53.38:27805```' },
+                    { name: 'Connection: ', value: 'Pour vous connecter via IP ouvrez FiveM,\n appuyez sur F8 puis entrez la commande suivante\n incluant "connect".\n\n```connect 88.198.53.38:30055```' },
                     { name: 'Actuellement en ligne: ', value:  `\`\`${playersNumber} Joueur(s)\`\``}
                 );
 
