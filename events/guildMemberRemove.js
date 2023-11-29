@@ -1,7 +1,7 @@
 const { Events, EmbedBuilder } = require('discord.js');
 const channelId = '1165065277155848284'
 module.exports = {
-    name: Events.GuildMemberAdd,
+    name: Events.GuildMemberRemove,
     once: false,
     execute(client, member) {
         const channel = client.channels.cache.get(channelId);
