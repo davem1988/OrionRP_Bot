@@ -13,7 +13,7 @@ module.exports = {
         const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
 
-        const since = `${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds`;
+        const since = `${days} jours, ${hours} heures, ${minutes} minutes, and ${seconds} secondes`;
 
         const newMemberEmbed =  new EmbedBuilder()
         .setTitle('Un membre vient de quitter')
