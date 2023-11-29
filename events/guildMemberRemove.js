@@ -6,7 +6,14 @@ module.exports = {
     execute(client, member) {
         const channel = client.channels.cache.get(channelId);
         const now = new Date()
-        const since = `${now - member.user.joinedAt * 1000 * 60 * 60 * 24 }`
+        const timeDifference = now - member.user.joinedAt;
+
+        const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+        const since = `${days} days, ${hours} hours, ${minutes} minutes, and ${seconds} seconds`;
 
         const newMemberEmbed =  new EmbedBuilder()
         .setTitle('Un membre vient de quitter')
