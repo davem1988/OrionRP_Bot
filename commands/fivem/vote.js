@@ -11,7 +11,7 @@ module.exports = {
         const ipEmbed = new EmbedBuilder()
         .setTitle('Commande: /vote')
         .setColor('Yellow')
-        .setDescription("@here N'oubliez pas de voter pour notre serveur afin d'avoir une meilleure visibilité. \n\nVoici le liens de vote du serveur: \n\n```https://top-serveurs.net/gta/orion-rp-655d19489d908```")
+        .setDescription("@everyone Hey! Il est l'heure de voter pour le serveur afin d'avoir une meilleure visibilité. \n\nVoici le lien du serveur: \n\nhttps://top-serveurs.net/gta/orion-rp-655d19489d908")
         .setTimestamp()
         .setAuthor({ name: `${interaction.client.user.username}`})
 
