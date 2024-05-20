@@ -1,9 +1,36 @@
-const {Client, GatewayIntentBits, Collection } = require('discord.js');
+const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('node:fs');
+const express = require('express');
+const app = express();
+const DiscordOAuth2 = require('discord-oauth2');
+const cookieParser = require('cookie-parser');
 const path = require('node:path');
+const mongoose = require('mongoose');
+const moduleRouter = require('./routes/module');
 require('dotenv').config();
 const token = process.env.TOKEN;
+const loadEvents = require('./handlers/eventsHandler');
+const loadCommands = require('./handlers/commandsHandler');
+const loadButtons = require('./handlers/buttonsHandler');
+const loadModals = require('./handlers/modalsHandler');
 
+app.enable('trust proxy');
+app.set('etag', false);
+app.use(express.static(__dirname + '/dashboard'));
+app.use('/getUserGuilds/:guildId/modules', moduleRouter);
+app.use('/getUserGuilds/:guildId/modules/:module/config', moduleRouter);
+app.use('/getUserGuilds/:guildId/modules/css', express.static(__dirname + '/dashboard/css/', { type: 'text/css' }));
+app.use('/getUserGuilds/:guildId/modules/js', express.static(__dirname + '/dashboard/js/', { type: 'application/javascript' }));
+app.use('/getUserGuilds/css', express.static(__dirname + '/dashboard/css/', { type: 'text/css' }));
+app.use('/getUserGuilds/js', express.static(__dirname + '/dashboard/js/', { type: 'application/javascript' }));
+app.set('views', __dirname)
+app.set('view engine', 'ejs');
+app.use(cookieParser());
+process.oauth = new DiscordOAuth2({
+    clientId: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    redirectUri: 'http://localhost:8081/callback'
+});
 
 const client = new Client({
     intents: [
@@ -21,42 +48,47 @@ const client = new Client({
     ]
 });
 
-const eventsPath = path.join(__dirname, 'events');
-const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith('.js'));
+// Load events and commands
+const loadEventsAndCommands = () => {
 
-for(const file of eventFiles) {
-    const filePath = path.join(eventsPath, file);
-    const event = require(filePath);
-    if(event.once) {
-        client.once(event.name, (...args) => event.execute(client, ...args));
-    } else {
-        client.on(event.name, (...args) => event.execute(client, ...args));
-    }
+    loadEvents(client);
+    loadCommands(client);
+    loadButtons(client);
+    loadModals(client);
+};
+
+const connectDatabase = () => {
+    mongoose.connect(process.env.DATABASE, {
+        autoIndex: false,
+        maxPoolSize: 10,
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
+        family: 4
+    }).then(() => { console.log('BOT -> Bot Orion Guard is connected to the DATABASE') })
+    .catch(err => { console.error(err)});
 }
 
-client.commands = new Collection();
-const commandsPath = path.join(__dirname, 'commands');
-
-// Read all directories in the 'commands' folder
-const commandFolders = fs.readdirSync(commandsPath);
-
-for (const folder of commandFolders) {
-    const folderPath = path.join(commandsPath, folder);
-    const commandFiles = fs.readdirSync(folderPath).filter(file => file.endsWith('.js'));
-
-    for (const file of commandFiles) {
-        const filePath = path.join(folderPath, file);
-        const command = require(filePath);
-
-        if (command.data && command.execute) {
-            client.commands.set(command.data.name, command);
-            console.log(`[SUCCESS] The command: ${command.data.name} is successfully registered`);
-        } else {
-            console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property`);
+// Load dashboard request handlers
+const loadDashboardHandlers = () => {
+    let files = fs.readdirSync('./dashboard/public').filter(f => f.endsWith('.js'));
+    files.forEach(f => {
+        const file = require(`./dashboard/public/${f}`);
+        if (file && file.name) {
+            app.get(file.name, file.run);
+            console.log(`[Dashboard] - Loaded ${file.name}`);
         }
-    }
-}
+    });
+};
 
-client.login(token);
+client.once('ready', () => {
+    console.log('Bot is ready!');
+    loadEventsAndCommands();
+    loadDashboardHandlers();
+    connectDatabase();
+
+    app.listen(process.env.WEB_PORT || 8081, () => console.log('Web Server listening on port: ' + process.env.WEB_PORT + '\n\n You can access the Dashboard here: http://localhost:8081'));
+});
+
+client.login(token).catch(console.error);
 
 module.exports = client;

@@ -1,9 +1,17 @@
 {
   "dependencies": {
     "axios": "^1.6.2",
+    "cookie-parser": "^1.4.6",
+    "discord-fivem-api": "^2.0.5",
+    "discord-oauth2": "^2.12.1",
     "discord.js": "^14.13.0",
     "dotenv": "^16.3.1",
-    "fivem": "^2.1.8"
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "fivem": "^2.1.8",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.0",
+    "nodemon": "^3.1.0"
   },
   "name": "orionrp_bot",
   "version": "1.0.0",
