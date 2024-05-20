@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Modules</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/modules.css">
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <p href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></p>
+        <a href="/dashboard"><i class="fa fa-tachometer"></i> <span class="sidebar-text"> Dashboard</span></a>
+        <a href="/getUserGuilds"><i class="fa fa-server"></i> <span class="sidebar-text">Servers</span></a>
+        <a href="/commands"><i class="fa fa-terminal"></i> <span class="sidebar-text"> Commands</span></a>
+        <a href="/settings"><i class="fa fa-cog"></i> <span class="sidebar-text"> Settings</span></a>
+        <a href="javascript:void(0)" onclick="logout()"><i class="fa fa-sign-out"></i> <span class="sidebar-text"> Logout</span></a>
+    </div>
+    <section class="main-content" id="main-content">
+        <div class="container">
+            <h1 class="text-center text-uppercase">Module Management For <%= guild.name %></h1>
+            <div id="modules-container" class="modules-container">
+                <% modules.forEach(module => { %>
+                    <% if (!module.isModule && !module.module) { %>
+                        <!-- Regular module card -->
+                        <div class="card mb-3 module-card">
+                            <div class="card-body">
+                                <h5 class="card-title module-title"><%= module.name %></h5>
+                                <p class="card-text module-description"><%= module.description %></p>
+                                <p class="module-status">Status: <%= module.active ? 'Activated' : 'Deactivated' %></p>
+                                <div class="switch">
+                                    <input type="checkbox" id="toggleSwitch<%= module.name %>" <%= module.active ? 'checked' : '' %> onclick="toggleModule('<%= module.name %>', <%= module.active %>, '<%= module.guild %>', '<%= module.isModule %>', '<%= JSON.stringify(modules) %>')">
+                                    <label class="slider" for="toggleSwitch<%= module.name %>"></label>
+                                </div>
+                                <% if(module.isConfigurable && module.active) {%> 
+                                    <button class="configBtn" onclick="openConfigModule('<%= module.name %>', '<%= module.guild %>')"><i class="fa fa-cog"></i></button>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% } else if (module.isModule) { %>
+                        <!-- Special container module card -->
+                        <div class="card mb-3 module-card">
+                            <div class="card-body">
+                                <h5 class="card-title module-title"><%= module.name %> Module</h5>
+                                <p class="card-text module-description"><%= module.description %></p>
+                                <p class="module-status">Status: <%= module.active ? 'Activated' : 'Deactivated' %></p>
+                                <div class="switch">
+                                    <input type="checkbox" id="toggleSwitch<%= module.name %>" <%= module.active ? 'checked' : '' %> onclick="toggleModule('<%= module.name %>', <%= module.active %>, '<%= module.guild %>', '<%= module.isModule %>', '<%= JSON.stringify(modules) %>')">
+                                    <label class="slider" for="toggleSwitch<%= module.name %>"></label>
+                                </div>
+                                <button onclick="openModulePage('<%= module.name %>', '<%= module.guild %>', '<%= JSON.stringify(modules) %>')"><i class="fa fa-cogs"></i></button>
+                            </div>
+                        </div>
+                    <% } %>
+                <% }); %>
+            </div>
+        </div>
+               
+    </section>
+    <script src="../js/getSetModule.js"></script>
+    <script>
+        
+        function logout() {
+            window.location.href = '/logout';
+        }
+
+        function openConfigModule(moduleName, guild){
+
+            window.location.href = `/getUserGuilds/${guild}/modules/${moduleName}/config`;
+        }
+
+        function openModulePage(moduleName, guild, modules) {
+            // Parse the modules parameter back into an array
+            modules = JSON.parse(modules);
+
+            // Filter modules based on the condition module.module === moduleName
+            const filteredModules = modules.filter(module => module.module && module.module === moduleName);
+
+            // Now you can redirect to the new page with the filtered modules
+            const queryParams = encodeURIComponent(JSON.stringify(filteredModules));
+            window.location.href = `/getUserGuilds/${guild}/modules/${moduleName}/?modules=${queryParams}`;
+        }
+
+        function toggleSidebar() {
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main-content");
+            var sidebarText = document.querySelectorAll('.sidebar-text');
+            var sidebarWidth = sidebar.style.width;
+
+            if (sidebarWidth === "70px" || sidebarWidth === "") {
+                sidebar.style.width = "250px";
+                sidebarText.forEach(text => text.style.display = "inline");
+                localStorage.setItem('sidebarState', 'expanded');
+            } else {
+                sidebar.style.width = "70px";
+                sidebarText.forEach(text => text.style.display = "none");
+                localStorage.setItem('sidebarState', 'collapsed');
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var sidebarState = localStorage.getItem('sidebarState');
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main-content");
+            var sidebarText = document.querySelectorAll('.sidebar-text');
+
+            if (sidebarState === 'collapsed') {
+                sidebar.style.width = "70px";
+                sidebarText.forEach(text => text.style.display = "none");
+            } else {
+                sidebar.style.width = "250px";
+                sidebarText.forEach(text => text.style.display = "inline");
+            }
+        });
+
+        async function toggleModule(moduleName, isActive, guildId, isModule, modules) {
+            modules = JSON.parse(modules);
+            try {
+                if (isActive) {
+                    if(isModule){
+                        await deactivateCommand(moduleName, guildId);
+                        modules.forEach(async module => {
+                            if(module.module === moduleName){
+                                await deactivateCommand(module.name, guildId);
+                            }
+                        })
+                    }else{
+                        await deactivateCommand(moduleName, guildId);
+                    }
+                } else {
+                    await activateCommand(moduleName, guildId);
+
+                    modules.forEach(async module => {
+                        if(module.name === moduleName){
+                            modules.forEach(async moduleModule => {
+                                if(moduleModule.name === module.module && moduleModule.isModule){
+                                    console.log(moduleModule)
+                                    await activateCommand(moduleModule.name, guildId);
+                                }
+                            })
+                            
+                        }
+                    })
+                }
+                // Reload modules after toggling
+                //const modules = await fetchAllModules(guildId);
+                //renderModules(modules);
+                window.location.reload();
+            } catch (error) {
+                console.error('Error toggling module:', error);
+            }
+        }
+
+        function renderModules(modules) {
+            const modulesContainer = document.getElementById('modules-container');
+            modulesContainer.innerHTML = ''; // Clear previous modules
+            modules.forEach(module => {
+                const moduleCard = `
+                    <div class="card mb-3 module-card">
+                        <div class="card-body">
+                            <h5 class="card-title module-title">${module.name}</h5>
+                            <p class="card-text module-description">${module.description}</p>
+                            <p class="module-status">Status: ${module.active ? 'Activated' : 'Deactivated'}</p>
+                            <div class="switch">
+                                <input type="checkbox" id="toggleSwitch${module.name}" ${module.active ? 'checked' : ''} onclick="toggleModule('${module.name}', ${module.active}, '${module.guild}')">
+                                <label class="slider" for="toggleSwitch${module.name}"></label>
+                            </div>
+                        </div>
+                    </div>`;
+                modulesContainer.insertAdjacentHTML('beforeend', moduleCard);
+            });
+        }
+    </script>
+</body>
+</html>

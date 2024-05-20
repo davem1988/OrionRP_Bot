@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/getUserGuilds.css">
+    <title>Guilds</title>
+</head>
+
+<body>
+    <div class="sidebar" id="sidebar">
+        <p href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></p>
+        <a href="/dashboard"><i class="fa fa-tachometer"></i> <span class="sidebar-text"> Dashboard</span></a>
+        <a href="/commands"><i class="fa fa-terminal"></i> <span class="sidebar-text"> Commands</span></a>
+        <a href="/settings"><i class="fa fa-cog"></i> <span class="sidebar-text"> Settings</span></a>
+        <a href="javascript:void(0)" onclick="logout()"><i class="fa fa-sign-out"></i> <span class="sidebar-text"> Logout</span></a>
+    </div>
+    <section class="main-content container mt-5" id="main-content">
+        <div class="text-center mb-4">
+            <img src="<%= avatar %>" alt="<%= username %>" class="rounded-circle" width="100">
+            <h2><%= username %>#<%= discriminator %></h2>
+        </div>
+
+        <div class="guild-section">
+            <h2>Guilds with Permissions</h2>
+            <div class="row">
+                <% mutualGuilds.forEach(g => { %>
+                <% if (g.hasPerm) { %>
+                <div class="col-md-4 mb-4">
+                    <div class="guild-card card">
+                        <img src="<%= g.avatar %>" class="card-img-top guild-avatar" alt="<%= g.name %>">
+                        <div class="card-body">
+                            <p><a class="btn btn-primary" href="/getUserGuilds/<%= g.id %>">Manage <%= g.name %></a></p>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+                <% }); %>
+            </div>
+        </div>
+
+        <div class="guild-section">
+            <h2>Guilds Without Bot</h2>
+            <div class="row">
+                <% nonMutualGuilds.forEach(g => { %>
+                <% if (g.hasPerm) { %>
+                <div class="col-md-4 mb-4">
+                    <div class="guild-card card">
+                        <img src="<%= g.avatar %>" class="card-img-top guild-avatar" alt="<%= g.name %>">
+                        <div class="card-body">
+                            <h5 class="card-title"><%= g.name %></h5>
+                            <p><a onclick="inviteBot('<%= g.id %>')" target="_blank" class="btn btn-primary">Invite Bot</a></p>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+                <% }); %>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function logout() {
+            window.location.href = '/logout';
+        }
+
+        function inviteBot(guildId) {
+            // Encode the guildId and any other parameters into base64
+            const stateParams = { guildId: guildId };
+            const encodedState = btoa(JSON.stringify(stateParams));
+    
+            const inviteUrl = `https://discord.com/oauth2/authorize?client_id=1240315858736124025&guild_id=${guildId}&permissions=8&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8081%2FgetUserGuilds%2F%3Aid&scope=identify+guilds+bot+applications.commands&state=${encodedState}`;
+    
+            // Redirect the user to the bot invite URL
+            window.location.href = inviteUrl;
+        }
+
+        function toggleSidebar() {
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main-content");
+            var sidebarText = document.querySelectorAll('.sidebar-text');
+            var sidebarWidth = sidebar.style.width;
+
+            if (sidebarWidth === "70px" || sidebarWidth === "") {
+                sidebar.style.width = "250px";
+                mainContent.style.marginLeft = "350px";
+                sidebarText.forEach(text => text.style.display = "inline");
+                localStorage.setItem('sidebarState', 'expanded');
+            } else {
+                sidebar.style.width = "70px";
+                mainContent.style.marginLeft = "350px";
+                sidebarText.forEach(text => text.style.display = "none");
+                localStorage.setItem('sidebarState', 'collapsed');
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var sidebarState = localStorage.getItem('sidebarState');
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main-content");
+            var sidebarText = document.querySelectorAll('.sidebar-text');
+
+            if (sidebarState === 'collapsed') {
+                sidebar.style.width = "70px";
+                mainContent.style.marginLeft = "350px";
+                sidebarText.forEach(text => text.style.display = "none");
+            } else {
+                sidebar.style.width = "250px";
+                mainContent.style.marginLeft = "350px";
+                sidebarText.forEach(text => text.style.display = "inline");
+            }
+        });
+    </script>
+    
+    
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

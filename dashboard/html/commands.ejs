@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/commands.css">
+    <title>Slash Commands</title>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <p class="closebtn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></p>
+        <a href="/dashboard"><i class="fa fa-tachometer"></i> <span class="sidebar-text"> Dashboard</span></a>
+        <a href="/getUserGuilds"><i class="fa fa-server"></i> <span class="sidebar-text">Servers</span></a>
+        <a href="/commands"><i class="fa fa-terminal"></i> <span class="sidebar-text"> Commands</span></a>
+        <a href="/settings"><i class="fa fa-cog"></i> <span class="sidebar-text"> Settings</span></a>
+        <a href="javascript:void(0)" onclick="logout()"><i class="fa fa-sign-out"></i> <span class="sidebar-text"> Logout</span></a>
+    </div>
+    <section class="main-content container mt-5" id="main-content">
+        <div class="text-center mb-4">
+            <h2>Slash Commands</h2>
+        </div>
+
+        <div class="commands-section">
+            <div class="row" id="commands-container">
+                <% commands.forEach(command => { %>
+                    <!-- Create a card for each command -->
+                    <div class="col-md-4 mb-4">
+                        <div class="command-card card">
+                            <div class="card-body">
+                                <h5 class="card-title"><%= command.name %></h5>
+                                <p class="card-text"><%= command.description %></p>
+                                <p><strong>Usage:</strong> <%= command.usage %></p>
+                                <p><%= command.details %></p>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function logout() {
+            window.location.href = '/logout';
+        }
+
+        function toggleSidebar() {
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main-content");
+            var sidebarText = document.querySelectorAll('.sidebar-text');
+            var sidebarWidth = sidebar.style.width;
+
+            if (sidebarWidth === "70px" || sidebarWidth === "") {
+                sidebar.style.width = "250px";
+                mainContent.style.marginLeft = "340px";
+                sidebarText.forEach(text => text.style.display = "inline");
+                localStorage.setItem('sidebarState', 'expanded');
+            } else {
+                sidebar.style.width = "70px";
+                mainContent.style.marginLeft = "340px";
+                sidebarText.forEach(text => text.style.display = "none");
+                localStorage.setItem('sidebarState', 'collapsed');
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var sidebarState = localStorage.getItem('sidebarState');
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main-content");
+            var sidebarText = document.querySelectorAll('.sidebar-text');
+
+            if (sidebarState === 'collapsed') {
+                sidebar.style.width = "70px";
+                mainContent.style.marginLeft = "340px";
+                sidebarText.forEach(text => text.style.display = "none");
+            } else {
+                sidebar.style.width = "250px";
+                mainContent.style.marginLeft = "340px";
+                sidebarText.forEach(text => text.style.display = "inline");
+            }
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

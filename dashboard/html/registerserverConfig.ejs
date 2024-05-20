@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/dashboard.css">
+  <title>Config <%= module %></title>
+</head>
+
+<body>
+    <div class="sidebar" id="sidebar">
+        <p href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></p>
+        <a href="/getUserGuilds"><i class="fa fa-server"></i> <span class="sidebar-text">Servers</span></a>
+        <a href="/commands"><i class="fa fa-terminal"></i> <span class="sidebar-text">Commands</span></a>
+        <a href="javascript:void(0)" onclick="redirectToModules('<%= guild.id %>')"><i class="fa fa-cogs"></i> <span class="sidebar-text"> Modules</span></a>
+        <a href="/settings"><i class="fa fa-cog"></i> <span class="sidebar-text">Settings</span></a>
+        <a href="javascript:void(0)" onclick="logout()"><i class="fa fa-sign-out"></i> <span class="sidebar-text">Logout</span></a>
+    </div>
+  
+  <div class="main-content" id="main-content">
+    <div class="maint-title"><%= module %> Configuration Page</div>
+
+    <div class="form-container">
+        <form id="serverForm">
+            <div class="input-group">
+                <label for="ip">IP Address:</label>
+                <input type="text" id="ip" name="ip" value="<%= server.ip %>">
+            </div>
+            <div class="input-group">
+                <label for="port">Port:</label>
+                <input type="text" id="port" name="port" value="<%= server.port %>">
+            </div>
+            <div class="input-group">
+                <label for="url">Vote URL:</label>
+                <input type="text" id="url" name="url" value="<%= server.url %>">
+            </div>
+            <button type="submit" class="submit-btn" onclick="updateValues('<%= guild.id %>', '<%= module %>')">Submit</button>
+        </form>
+    </div>
+
+    <div class="alert fade-out" id="alert">
+        <span class="closebtn" onclick="closeAlert();">&times;</span>
+        <div id="alertMessage">
+            This is an alert box.
+        </div>
+    </div>
+
+  <script src="../js/getSetModule.js"></script>
+  <script>
+
+    function closeAlert(){
+        document.getElementById('alert').classList.remove('fade-in');
+        document.getElementById('alert').classList.add('fade-out');
+    }
+
+    function showAlert(type, message){
+        const alert = document.getElementById('alert');
+        const alertMessage = document.getElementById('alertMessage');
+        alert.classList.remove('fade-out');
+        alert.classList.add('fade-in');
+        alert.classList.add(type);
+        alertMessage.innerHTML = message;
+    }
+
+    function logout() {
+      window.location.href = '/logout';
+    }
+
+    function redirectToModules(guildId){
+        window.location.href = `/getUserGuilds/${guildId}/modules`
+    }
+
+    function refreshPage() {
+        window.location.reload();
+    }
+
+    function toggleSidebar() {
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main-content");
+            var sidebarText = document.querySelectorAll('.sidebar-text');
+            var sidebarWidth = sidebar.style.width;
+
+            if (sidebarWidth === "70px" || sidebarWidth === "") {
+                sidebar.style.width = "250px";
+                sidebarText.forEach(text => text.style.display = "inline");
+                localStorage.setItem('sidebarState', 'expanded');
+            } else {
+                sidebar.style.width = "70px";
+                sidebarText.forEach(text => text.style.display = "none");
+                localStorage.setItem('sidebarState', 'collapsed');
+            }
+        }
+
+        async function updateValues(event) {
+            event.preventDefault(); // Prevent default form submission
+            const guildId = '<%= guild.id %>';
+            const module = '<%= module %>';
+            const ip = document.getElementById('ip').value;
+            const port = document.getElementById('port').value;
+            const url = document.getElementById('url').value;
+
+            const updated = await updateServerInfo(guildId, module, ip, port, url);
+            if (updated) {
+                // Update the displayed values without reloading the page
+                document.getElementById('ip').value = updated.ip;
+                document.getElementById('port').value = updated.port;
+                document.getElementById('url').value = updated.url;
+                showAlert('success', 'Server info updated successfully');
+                
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var sidebarState = localStorage.getItem('sidebarState');
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main-content");
+            var sidebarText = document.querySelectorAll('.sidebar-text');
+
+            if (sidebarState === 'collapsed') {
+                sidebar.style.width = "70px";
+                sidebarText.forEach(text => text.style.display = "none");
+            } else {
+                sidebar.style.width = "250px";
+                sidebarText.forEach(text => text.style.display = "inline");
+            }
+
+            document.getElementById('serverForm').addEventListener('submit', updateValues);
+        });
+  </script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+
+</html>

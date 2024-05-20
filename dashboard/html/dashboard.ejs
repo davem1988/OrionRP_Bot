@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/dashboard.css">
+  <title>Home page</title>
+</head>
+
+<body>
+    <div class="sidebar" id="sidebar">
+        <p href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></p>
+        <a href="/getUserGuilds"><i class="fa fa-server"></i> <span class="sidebar-text">Servers</span></a>
+        <a href="/commands"><i class="fa fa-terminal"></i> <span class="sidebar-text">Commands</span></a>
+        <a href="/settings"><i class="fa fa-cog"></i> <span class="sidebar-text">Settings</span></a>
+        <a href="javascript:void(0)" onclick="logout()"><i class="fa fa-sign-out"></i> <span class="sidebar-text">Logout</span></a>
+    </div>
+  
+  <div class="main-content" id="main-content">
+    
+    <p id='user'>
+      You're currently logged in as <b><%= username %>#<%= discriminator %></b>. 
+      <img src="<%= avatar %>" alt="<%= username %>" width="42" height="42" style="vertical-align:middle">
+    </p>
+  </div>
+
+  <script>
+    function logout() {
+      window.location.href = '/logout';
+    }
+
+    function viewGuilds() {
+      window.location.href = '/getUserGuilds';
+    }
+
+    function toggleSidebar() {
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main-content");
+            var sidebarText = document.querySelectorAll('.sidebar-text');
+            var sidebarWidth = sidebar.style.width;
+
+            if (sidebarWidth === "70px" || sidebarWidth === "") {
+                sidebar.style.width = "250px";
+                sidebarText.forEach(text => text.style.display = "inline");
+                localStorage.setItem('sidebarState', 'expanded');
+            } else {
+                sidebar.style.width = "70px";
+                sidebarText.forEach(text => text.style.display = "none");
+                localStorage.setItem('sidebarState', 'collapsed');
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var sidebarState = localStorage.getItem('sidebarState');
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main-content");
+            var sidebarText = document.querySelectorAll('.sidebar-text');
+
+            if (sidebarState === 'collapsed') {
+                sidebar.style.width = "70px";
+                sidebarText.forEach(text => text.style.display = "none");
+            } else {
+                sidebar.style.width = "250px";
+                sidebarText.forEach(text => text.style.display = "inline");
+            }
+        });
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+
+</html>

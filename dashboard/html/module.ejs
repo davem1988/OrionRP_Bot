@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title><%= moduleName %> modules</title>
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="../css/modules.css">
+    </head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <p href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></p>
+        <a href="/dashboard"><i class="fa fa-tachometer"></i> <span class="sidebar-text"> Dashboard</span></a>
+        <a href="/getUserGuilds"><i class="fa fa-server"></i> <span class="sidebar-text">Servers</span></a>
+        <a href="/commands"><i class="fa fa-terminal"></i> <span class="sidebar-text"> Commands</span></a>
+        <a href="javascript:void(0)" onclick="redirectToModules('<%= guild.id %>')"><i class="fa fa-cogs"></i> <span class="sidebar-text"> Modules</span></a>
+        <a href="/settings"><i class="fa fa-cog"></i> <span class="sidebar-text"> Settings</span></a>
+        <a href="javascript:void(0)" onclick="logout()"><i class="fa fa-sign-out"></i> <span class="sidebar-text"> Logout</span></a>
+    </div>
+    <section class="main-content" id="main-content">
+        <div class="container">
+            <h1 class="text-center text-uppercase">Module Management For <%= moduleName %></h1>
+            <div id="modules-container" class="modules-container">
+                <% modules.forEach(module => { %>
+                        <div class="card mb-3 module-card">
+                            <div class="card-body">
+                                <h5 class="card-title module-title"><%= module.name %></h5>
+                                <p class="card-text module-description"><%= module.description %></p>
+                                <p class="module-status">Status: <%= module.active ? 'Activated' : 'Deactivated' %></p>
+                                <div class="switch">
+                                    <input type="checkbox" id="toggleSwitch<%= module.name %>" <%= module.active ? 'checked' : '' %> onclick="toggleModule('<%= module.name %>', <%= module.active %>, '<%= module.guild %>', '<%= JSON.stringify(modules) %>')">
+                                    <label class="slider" for="toggleSwitch<%= module.name %>"></label>
+                                </div>
+                                <% if(module.isConfigurable && module.active) {%> 
+                                    <button class="configBtn" onclick="openConfigModule('<%= module.name %>', '<%= module.guild %>')"><i class="fa fa-cog"></i></button>
+                                <% } %>
+                            </div>
+                        </div>
+                <% }); %>
+            </div>
+        </div>
+               
+    </section>
+    <script src="../js/getSetModule.js"></script>
+    <script>
+
+        function openConfigModule(moduleName, guild){
+
+            window.location.href = `/getUserGuilds/${guild}/modules/${moduleName}/config`;
+        }
+
+        function redirectToModules(guildId){
+            window.location.href = `/getUserGuilds/${guildId}/modules`
+        }
+
+        function logout() {
+            window.location.href = '/logout';
+        }
+
+        function toggleSidebar() {
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main-content");
+            var sidebarText = document.querySelectorAll('.sidebar-text');
+            var sidebarWidth = sidebar.style.width;
+
+            if (sidebarWidth === "70px" || sidebarWidth === "") {
+                sidebar.style.width = "250px";
+                sidebarText.forEach(text => text.style.display = "inline");
+                localStorage.setItem('sidebarState', 'expanded');
+            } else {
+                sidebar.style.width = "70px";
+                sidebarText.forEach(text => text.style.display = "none");
+                localStorage.setItem('sidebarState', 'collapsed');
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var sidebarState = localStorage.getItem('sidebarState');
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main-content");
+            var sidebarText = document.querySelectorAll('.sidebar-text');
+
+            if (sidebarState === 'collapsed') {
+                sidebar.style.width = "70px";
+                sidebarText.forEach(text => text.style.display = "none");
+            } else {
+                sidebar.style.width = "250px";
+                sidebarText.forEach(text => text.style.display = "inline");
+            }
+        });
+
+        async function toggleModule(moduleName, isActive, guildId, modules) {
+            modules = JSON.parse(modules);
+            try {
+                if (isActive) {
+                    await deactivateCommand(moduleName, guildId);
+                } else {
+                    await activateCommand(moduleName, guildId);
+                    modules.forEach(async (module) => {
+                        if(module.name === moduleName) {
+                            if(module.module){
+                                await activateCommand(module.module, guildId);
+                            }
+                        }
+                    })
+                }
+                // Reload modules after toggling
+                //const modules = await fetchAllModules(guildId);
+                //renderModules(modules);
+                window.location.reload();
+            } catch (error) {
+                console.error('Error toggling module:', error);
+            }
+        }
+
+        function renderModules(modules) {
+            const modulesContainer = document.getElementById('modules-container');
+            modulesContainer.innerHTML = ''; // Clear previous modules
+            modules.forEach(module => {
+                const moduleCard = `
+                    <div class="card mb-3 module-card">
+                        <div class="card-body">
+                            <h5 class="card-title module-title">${module.name}</h5>
+                            <p class="card-text module-description">${module.description}</p>
+                            <p class="module-status">Status: ${module.active ? 'Activated' : 'Deactivated'}</p>
+                            <div class="switch">
+                                <input type="checkbox" id="toggleSwitch${module.name}" ${module.active ? 'checked' : ''} onclick="toggleModule('${module.name}', ${module.active}, '${module.guild}')">
+                                <label class="slider" for="toggleSwitch${module.name}"></label>
+                            </div>
+                        </div>
+                    </div>`;
+                modulesContainer.insertAdjacentHTML('beforeend', moduleCard);
+            });
+        }
+    </script>
+</body>
+</html>
